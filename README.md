@@ -21,3 +21,4 @@ implementing and running the examples locally, mainly using **Hopsworks**.
 
 - Reproduced and slightly modified examples from the book
 - Personal experiments and notes while reading
+- [Examples Dashboard](https://gaoxiaoliang.github.io/featurestorebook-examples/)
