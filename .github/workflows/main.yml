@@ -1,0 +1,66 @@
+name: Hourly Titanic Feature Pipeline & Inference
+
+# 每小时触发
+on:
+  schedule:
+    - cron: '0 * * * *'   # 每小时第0分钟
+  workflow_dispatch:       # 可手动触发
+
+jobs:
+  run-titanic-scripts:
+    runs-on: ubuntu-latest
+
+    env:
+      HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+
+    steps:
+      # 1️⃣ 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 确保可以切换分支提交
+
+      # 2️⃣ 设置 Python
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.9
+
+      # 3️⃣ 安装依赖
+      - name: Install dependencies
+        working-directory: chapter02
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4️⃣ 执行脚本
+      - name: Run feature pipeline & batch inference
+        working-directory: chapter02
+        run: |
+          set -e  # 遇到错误停止
+          python scheduled-titanic-feature-pipeline-daily.py
+          python scheduled-titanic-batch-inference-daily.py
+
+      # 5️⃣ 提交 HTML 到 gh-pages 分支
+      - name: Commit and push titanic.html to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # 切换到 gh-pages 分支，如果不存在就创建
+          if git rev-parse --verify origin/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+          fi
+
+          # 拷贝 titanic.html 到根目录（或保持原路径）
+          cp chapter02/titanic.html ./titanic.html
+
+          git add titanic.html
+
+          # 仅当文件有改动时才 commit
+          git diff --cached --quiet || git commit -m "Update titanic.html ($(date -u))"
+
+          # 推送到 gh-pages 分支
+          git push origin gh-pages
