@@ -16,8 +16,9 @@ feature_view = fs.get_or_create_feature_view(
     transformation_functions=[label_encoder("sex"), label_encoder("embarked")],
     query=selected_features,
 )
-
+print(feature_view.version)
 X_train, X_test, y_train, y_test = feature_view.train_test_split(0.2)
+print(feature_view.version)
 
 import xgboost as xgb
 model = xgb.XGBClassifier()
@@ -58,5 +59,6 @@ titanic_model = mr.python.create_model(
         feature_view=feature_view,
         description='Titanic Survivor Predictor'
         )
+print(titanic_model._feature_view.version)
 
 titanic_model.save(model_dir)
