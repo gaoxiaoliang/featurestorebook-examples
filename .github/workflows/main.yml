@@ -3,7 +3,7 @@ name: Hourly Titanic Feature Pipeline & Inference
 # 每小时触发
 on:
   schedule:
-    - cron: '0 * * * *'   # 每小时第0分钟
+    - cron: '0 6,18 * * *'   # 每小时第0分钟
   workflow_dispatch:       # 可手动触发
 
 jobs:
@@ -57,10 +57,7 @@ jobs:
             git checkout --orphan gh-pages
           fi
 
-          # 拷贝 titanic.html 到根目录（或保持原路径）
-          cp chapter02/titanic.html ./titanic.html
-
-          git add titanic.html
+          git add chapter02/titanic.html
 
           # 仅当文件有改动时才 commit
           git diff --cached --quiet || git commit -m "Update titanic.html ($(date -u))"
