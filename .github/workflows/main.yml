@@ -34,12 +34,15 @@ jobs:
           pip install -r requirements.txt
 
       # 4️⃣ 执行脚本
-      - name: Run feature pipeline & batch inference
+      - name: Run feature pipeline
         working-directory: chapter02
-        run: |
-          set -e  # 遇到错误停止
-          python scheduled-titanic-feature-pipeline-daily.py
-          python scheduled-titanic-batch-inference-daily.py
+        run: python scheduled-titanic-feature-pipeline-daily.py
+        continue-on-error: true
+      
+      - name: Run batch inference
+        working-directory: chapter02
+        run: python scheduled-titanic-batch-inference-daily.py
+        continue-on-error: true
 
       # 5️⃣ 提交 HTML 到 gh-pages 分支
       - name: Commit and push titanic.html to gh-pages
