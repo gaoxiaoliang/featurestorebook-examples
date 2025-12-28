@@ -123,8 +123,16 @@ titanic_fg.insert(titanic_df, wait=True)
 def remove_last_line_from_string(s):
     return s[:s.rfind('\n')]
 passenger_details = remove_last_line_from_string(str(titanic_df.iloc[0]))
+
+def get_time_str():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    now = datetime.now(ZoneInfo("Europe/Stockholm"))
+    return now.strftime("%Y-%m-%d %H:%M:%S %Z")
+
 with open(f'titanic.html', 'w', newline='\n') as file:
-    file.write(f'<h2>Generated passenger({"Survivor" if titanic_df.iloc[0].survived == 1 else "Non-Survivor"})</h2>')
+    file.write(f'<h2>Generated passenger({"Survivor" if titanic_df.iloc[0].survived == 1 else "Non-Survivor"}, {get_time_str()})</h2>')
     file.write('<pre>')
     file.write(passenger_details)
     file.write('</pre>')

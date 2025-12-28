@@ -23,8 +23,15 @@ def remove_last_line_from_string(s):
     return s[:s.rfind('\n')]
 passenger_details = remove_last_line_from_string(str(passenger_details))
 
+def get_time_str():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    now = datetime.now(ZoneInfo("Europe/Stockholm"))
+    return now.strftime("%Y-%m-%d %H:%M:%S %Z")
+
 with open(f'titanic.html', 'a', newline='\n') as file:
-    file.write('<h2>Predicted passenger</h2>')
+    file.write(f'<h2>Predicted passenger({get_time_str()})</h2>')
     file.write('<pre>')
     file.write(passenger_details)
     file.write('</pre>')

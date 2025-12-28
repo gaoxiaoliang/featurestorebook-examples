@@ -34,15 +34,46 @@ jobs:
           pip install -r requirements.txt
 
       # 4️⃣ 执行脚本
-      - name: Run feature pipeline
+      - name: Run feature pipeline (retry up to 10 times)
         working-directory: chapter02
-        run: python scheduled-titanic-feature-pipeline-daily.py
-        continue-on-error: true
-      
-      - name: Run batch inference
+        run: |
+          set -e
+
+          for i in $(seq 1 10); do
+            echo "🚀 Feature pipeline attempt $i / 10"
+            if python scheduled-titanic-feature-pipeline-daily.py; then
+              echo "✅ Feature pipeline succeeded on attempt $i"
+              break
+            fi
+
+            if [ "$i" -eq 10 ]; then
+              echo "❌ Feature pipeline failed after 10 attempts"
+              exit 1
+            fi
+
+            echo "⏳ Sleeping 60 seconds before retry..."
+            sleep 60
+          done
+      - name: Run batch inference (retry up to 10 times)
         working-directory: chapter02
-        run: python scheduled-titanic-batch-inference-daily.py
-        continue-on-error: true
+        run: |
+          set -e
+
+          for i in $(seq 1 10); do
+            echo "🚀 Batch inference attempt $i / 10"
+            if python scheduled-titanic-batch-inference-daily.py; then
+              echo "✅ Batch inference succeeded on attempt $i"
+              break
+            fi
+
+            if [ "$i" -eq 10 ]; then
+              echo "❌ Batch inference failed after 10 attempts"
+              exit 1
+            fi
+
+            echo "⏳ Sleeping 60 seconds before retry..."
+            sleep 60
+          done
 
       # 5️⃣ 提交 HTML 到 gh-pages 分支
       - name: Commit and push titanic.html to gh-pages
