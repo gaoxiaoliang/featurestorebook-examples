@@ -81,13 +81,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 切换到 gh-pages 分支，如果不存在就创建
-          if git rev-parse --verify origin/gh-pages; then
-            git checkout gh-pages
-          else
-            git checkout --orphan gh-pages
-          fi
+          mkdir -p /tmp/deploy
+          cp chapter02/titanic.html /tmp/deploy/
 
+          git checkout -f gh-pages
+          cp /tmp/deploy/titanic.html chapter02/
           git add chapter02/titanic.html
 
           # 仅当文件有改动时才 commit
